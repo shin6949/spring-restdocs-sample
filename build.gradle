@@ -3,10 +3,12 @@ plugins {
     id 'org.springframework.boot' version '3.4.2'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'com.epages.restdocs-api-spec' version '0.19.4'
+    id 'org.hidetake.swagger.generator' version '2.19.2'
 }
 
 group = 'me.cocoblue'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 
 java {
     toolchain {
@@ -24,27 +26,60 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    set('snippetsDir', file("build/generated-snippets"))
-}
-
 dependencies {
+    // For Spring RestDocs
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // For Spring Restdocs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.17.1'
+//    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
-tasks.named('test') {
-    outputs.dir snippetsDir
+openapi3 {
+    servers = [
+            // 2개 이상 설정하고자 하는 경우, 추가 가능
+            { url = "http://localhost:8080"; description = "Local server" }
+    ]
+    title = "Spring Restdocs with SwaggerUI Sample"
+    description = "This is made with Spring REST Docs with SwaggerUI."
+    version = "1.0.0"
+    format = 'json'
+
+    // /static/docs/SAMPLE - 0.0.1.json 생성 → jar 파일만 배포할 예정이기에 build 에 출력
+    outputDirectory = 'build/resources/main/static/docs'
+}
+
+test {
     useJUnitPlatform()
 }
 
-tasks.named('asciidoctor') {
-    inputs.dir snippetsDir
-    dependsOn test
+tasks.withType(GenerateSwaggerUI) {
+    // openapi3 테스크 이후에 실행 됨
+    dependsOn 'openapi3'
+
+    //기존 파일 삭제했다가, build 에 json 정적파일 복사 (안해도 됨 → local 확인용)
+    delete file('src/main/resources/static/docs/')
+    copy {
+        from "build/resources/main/static/docs"
+        into "src/main/resources/static/docs/"
+    }
 }
+
+bootJar {
+    dependsOn(':test"')
+    dependsOn(':openapi3')
+}
+
+ext {
+    // snippetsDirectory 설정
+    snippetsDir = file('build/generated-snippets')
+}
+
