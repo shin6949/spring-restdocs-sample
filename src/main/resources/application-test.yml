@@ -3,7 +3,7 @@ spring:
     name: "spring-restdocs-sample"
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:db;MODE=MySQL
+    url: jdbc:h2:mem:testdb;MODE=MySQL
     username: sa
     password: sa
   jpa:
@@ -23,3 +23,7 @@ springdoc:
   swagger-ui:
     url: /docs/openapi3.json
     path: /docs/swagger
+
+logging:
+  level:
+    me.cocoblue: DEBUG

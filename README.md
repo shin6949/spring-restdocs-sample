@@ -20,8 +20,8 @@
 
 ## API Documentation with Swagger UI
 Swagger UI를 통해 API 문서를 확인할 수 있습니다.
-- <URL>/docs/swagger-ui
+- <URL>/docs/swagger
 
 ## References
-[
-스프링부트3 Spring REST docs + Swagger UI 사용하기 By.E@st](https://jun27.tistory.com/65)
+[스프링부트3 Spring REST docs + Swagger UI 사용하기 By.E@st](https://jun27.tistory.com/65)  
+[OpenAPI Specification을 이용한 더욱 효과적인 API 문서화 By.KakaoPay](https://tech.kakaopay.com/post/openapi-documentation/)
